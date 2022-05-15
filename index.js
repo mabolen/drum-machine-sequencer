@@ -1,10 +1,7 @@
-const SeqRow = () => {
+const SeqRow = ({ addClass }) => {
     //number of sequencer buttons
     const seqArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-    //makes seq button active/inactive on click and changes color
-    const addClass = (e) => {
-        e.classList.length < 3 ? e.classList.add('seq-btn-active') : e.classList.remove('seq-btn-active') 
-    }
+    
     //map seq buttons to DOM
     const seqMap = seqArray.map((num) => {
                 return <div className={`seq-btn col-${num}`} key={num} onClick={(e)=>addClass(e.target)}></div>
@@ -14,6 +11,19 @@ const SeqRow = () => {
       <div className='seq-row'>
           {seqMap}
       </div>
+    )
+}
+
+const RowOption = ({ updateRow, labelName, optionMap }) => {
+
+    return (
+        <div className='option'>
+            <label>{labelName}</label>
+            <select className='select text-glow' onChange={(e)=> {updateRow(e.target.value)}}>
+                <option></option>
+                {optionMap}
+            </select>
+        </div>
     )
 }
 
@@ -66,16 +76,16 @@ const App = () => {
     const playStep = (num) => {
         const seqStep = document.getElementsByClassName(`col-${num}`)
         const seqLight = document.getElementById(`seq-${num}`)
-        if (seqStep[0].className.length > 27) {
+        if (seqStep[0].classList.contains('seq-btn-active')) {
             playClip(row1)
         }
-        if (seqStep[1].className.length > 27) {
+        if (seqStep[1].classList.contains('seq-btn-active')) {
             playClip(row2)
         }
-        if (seqStep[2].className.length > 27) {
+        if (seqStep[2].classList.contains('seq-btn-active')) {
             playClip(row3)
         }
-        if (seqStep[3].className.length > 27) {
+        if (seqStep[3].classList.contains('seq-btn-active')) {
             playClip(row4)
         }
         seqLight.classList.add('seq-btn-active')
@@ -102,18 +112,23 @@ const App = () => {
         } 
         return function clear() {
             clearInterval(intervalId)
-            console.log('return clear')
         }
         
     }, [timerIsActive])
+    
+    //makes seq button active/inactive on click and changes color
+    /***
+     * @param {Element} e
+     */
+     const addClass = (e) => {
+        e.classList.contains('seq-btn-active') ? e.classList.remove('seq-btn-active') : e.classList.add('seq-btn-active')
+    }
 
-    const timer = () => {
+    //handle play button click
+    const timer = (e) => {
         counter = 1
         timerIsActive ? setTimerIsActive(false) : setTimerIsActive(true)
-        $('#play').css('background-color', '#ff4444')
-            setTimeout(() => {
-                $('#play').css('background-color', '#f18973')
-            }, 50)
+        addClass(e.target)
     }
 
     //functions to play audio clips
@@ -163,10 +178,6 @@ const App = () => {
         ['C', 'high-tom', sounds.highTom]
     ]
 
-    const padKeys = padLetters.map( e => {
-        return <div onClick={() => {playAudio(e[1])}} key={e[0]} className={`drum-pad ${e[1]}`} id={e[0]}>{e[0]}<audio id={e[1]} src={e[2]}></audio></div>
-    })
-
     //allow user to change bpm
     const enterBpm = () => {
         const bpmInput = document.getElementById('bpm').value
@@ -176,16 +187,6 @@ const App = () => {
                 $('#btn-bpm').css('background-color', '#f18973')
             }, 50)
     }
-
-    //sequencer section
-    const lightArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-    const lightMap = lightArray.map((el)=> {
-        return (
-            <div key={el} className='light-box'>
-                <div id={`seq-${el}`} className='seq-light'></div>
-            </div>
-        )
-    })
 
     //functions to set row sound state
     const updateRow1 = (value) => {
@@ -208,61 +209,51 @@ const App = () => {
         )
     })
 
+    //sequencer section
+    const lightArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    const lightMap = lightArray.map((el)=> {
+        return (
+            <div key={el} className='light-box'>
+                <div id={`seq-${el}`} className='seq-light'></div>
+            </div>
+        )
+    })
+    //drum pad keys, can be clicked or played with key press
+    const padKeys = padLetters.map( e => {
+        return <div onClick={() => {playAudio(e[1])}} key={e[0]} className={`drum-pad ${e[1]}`} id={e[0]}>{e[0]}<audio id={e[1]} src={e[2]}></audio></div>
+    })
+
   return (
     <div id='container'>
         <div className='row'>
             <div id='drum-machine' >
                 <div id='title-box'>
-                    <h1 id="title">Beatboi 2.0</h1>
-                    <div className='option'>
-                        <label>Row 1 </label>
-                        <select className='select' onChange={(e)=> {updateRow1(e.target.value)}}>
-                            <option></option>
-                            {optionMap}
-                        </select>
-                    </div>
-                    <div className='option'>
-                        <label>Row 2 </label>
-                        <select className='select' onChange={(e)=> {updateRow2(e.target.value)}}>
-                            <option></option>
-                            {optionMap}
-                        </select>
-                    </div>
-                    <div className='option'>
-                        <label>Row 3 </label>
-                        <select className='select' onChange={(e)=> {updateRow3(e.target.value)}}>
-                            <option></option>
-                            {optionMap}
-                        </select>
-                    </div>
-                    <div className='option'>
-                        <label>Row 4 </label>
-                        <select className='select' onChange={(e)=> {updateRow4(e.target.value)}}>
-                            <option></option>
-                            {optionMap}
-                        </select>
-                    </div>
+                    <h1 id="title" className='text-glow'>Beatboi 2.0</h1>
+                    <RowOption updateRow={updateRow1} labelName={'Row 1 '} optionMap={optionMap} />
+                    <RowOption updateRow={updateRow2} labelName={'Row 2 '} optionMap={optionMap} />
+                    <RowOption updateRow={updateRow3} labelName={'Row 3 '} optionMap={optionMap} />
+                    <RowOption updateRow={updateRow4} labelName={'Row 4 '} optionMap={optionMap} />
                 </div>
                 <div id='drum-pads'>
                     {padKeys}
                 </div>
                 <div id='display-box'>
-                    <div id='display'><p>{displayText}</p></div>
+                    <div id='display'><p className='text-glow'>{displayText}</p></div>
                     <div id='bpm-div'>
-                        <input id="bpm" type="text" name='bpm' placeholder='100'></input>
+                        <input id="bpm" className='text-glow' type="text" name='bpm' placeholder='100'></input>
                         <button id='btn-bpm' className='btn' onClick={enterBpm}>BPM</button>
                     </div>
-                    <img id='play' onClick={timer} className='icon' src='play_pause.svg'></img>
+                    <img id='play' onClick={(e)=> timer(e)} className='icon' src='play_pause.svg'></img>
                 </div>
             </div>
             <div id='sequencer'>
                 <div className='seq-row'>
                     {lightMap}
                 </div>
-                <SeqRow className='row row1' />
-                <SeqRow className='row row2' />
-                <SeqRow className='row row3' />
-                <SeqRow className='row row4' />
+                <SeqRow className='row row1' addClass={addClass} />
+                <SeqRow className='row row2' addClass={addClass} />
+                <SeqRow className='row row3' addClass={addClass} />
+                <SeqRow className='row row4' addClass={addClass} />
             </div>
         </div>
     </div>

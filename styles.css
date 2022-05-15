@@ -82,7 +82,8 @@ body {
 }
 
 .seq-btn-active {
-    background-color: #ff4444;
+    background: radial-gradient(#ff8080, #ff4444);
+    box-shadow: 0 0 3px 2px #ff4444;
 }
 
 /* display section */
@@ -102,14 +103,18 @@ body {
     max-width: 100px;
     border: 2px inset rgb(157, 157, 157);
     background-color: #1F201F;
-    color: #f18973;
     text-align: center;
     text-align: center;
     margin: 10px;
 }
 
+.text-glow {
+    color: #ff8080;
+    text-shadow: #ff4444 1px 1px 5px;
+}
+
 p {
-    margin-top: 6px;
+    margin-top: 5px;
     font-weight: 600;
 }
 
@@ -181,7 +186,6 @@ p {
     border-style: inset;
     margin: 10px;
     background-color: #1F201F;
-    color: #f18973;
 }
 
 .option {
